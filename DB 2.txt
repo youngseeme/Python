@@ -1,0 +1,143 @@
+실습1. 병원 데이터베이스 생성
+
+CREATE DATABASE hospital_lab;
+USE hospital_lab;
+
+
+
+실습2. 환자 테이블 만들기
+
+CREATE TABLE paitents (
+	patient_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    birth_date DATE,
+    gender ENUM('M', 'F') NOT NULL,
+    phonr VARCHAR(20),
+    email VARCHAR(100),
+    address VARCHAR(200),
+    visit_count INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+3. 의사 테이블 만들기
+
+CREATE TABLE doctors (
+	doctor_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    department VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+    email VARCHAR(100),
+    hire_date DATE
+);
+
+
+
+4. 예약 테이블 만들기
+
+CREATE TABLE appoinments (
+	appointment_id INT AUTO_INCREMENT PRIMARY KEY,
+    patient_id INT NOT NULL,
+    doctor_id INT NOT NULL,
+    visit_date DATE NOT NULL,
+    status ENUM('Scheduled', 'Completed', 'Canceled') DEFAULT 'Scheduled',
+    chart VARCHAR(255),
+    patient_name VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CUREENT_TIMESTAMP,
+    FOREIGN KEY (patient_id) REFERENCES patients(patient_id),
+    FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_is)
+);
+
+
+
+
+5. 데이터 삽입(환자3, 의사3, 예약3)
+
+<환자 데이터 삽입>
+INSERT INTO patients
+	(name, birth_date, gender, phone, email, address, visit_count, created_at)
+VALUES
+	('박지음', '1995-01-01', 'F', '010-1111-2222', 'jieum@naver.com', '서울시 강서구', 0, NOW()),
+    ('백승헌', '1997-09-08', 'M', '010-3333-4444', 'feel@gmail.com', '부산시 중구', 0, NOW()),
+    ('김찬미', '1999-05-29', 'F', '010-5555-6666', 'charles@hanmail.net', '성남시 분당구', 0, NOW());
+
+<의사 데이터 삽입>
+INSERT INTO doctors
+	(name, department, phone, email, hire_date, created_at)
+VALUES
+	('우창윤', 'IM', '010-7777-8888', 'internal@naver.com', '2018-03-12', NOW()),
+    ('오진승', 'PY', '010-9999-1111', 'psychiatry@gmail.com', '2020-07-07', NOW()),
+    ('이낙준', 'OL', '010-2222-3333', 'ent@hanmail.net', '2019-11-05', NOW());
+
+<예약 데이터 삽입>
+INSERT INTO appointments
+	(patient_id, doctor_id, visit_date, status, chart, patient_name, created_at)
+VALUES
+	(1, 1, '2025-10-20', 'Scheduled', '알러지, 호흡부전', '박지음', NOW()),
+    (2, 2, '2025-10-21', 'Completed', 'depressive episode', '백승헌', NOW()),
+    (3, 3, '2025-10-23', 'Scheduled', '부비동염', '김찬미', NOW());
+
+
+
+6. 데이터 조회 (모든환자, 여성환자, 예약일 내림차순 정렬)
+
+<모든 환자 조회>
+SELECT *
+FROM patients;
+
+<여성환자 조회>
+SELECT *
+FROM patients
+WHERE gender = 'F';
+
+<예약일 내림차순 정렬>
+SELECT *
+FROM appointments
+ORDER BY visit_date DESC;
+
+
+
+7. 데이터 수정 (특정환자 전번수정, 모든과거예약 완료로 수정)
+
+<환자 1번 전번 수정>
+UPDATE patients
+SET phone = '010-1234-5566'
+WHERE patient_id = 1;
+
+<모든 과거 예약 완료로 수정>
+UPDATE appointments
+SET status = 'Completed'
+WHERE visit_date < NOW();
+
+
+
+8. 데이터 삭제 (예약번호 3번 삭제, 특정환자 이름 기준 삭제)
+
+<예약번호 3번 삭제>
+DELETE FROM appointments
+WHERE appointment_id = 3;
+
+<특정환자 이름 기준 삭제>
+DELETE FROM appointments
+WHERE patient_name = '박지음';
+
+
+
+9. 조건 검색(특정 성씨 이름 환자, 특정 날짜사이 예약, 특정 단어 메모 조회)
+
+<특정 성씨 이름 환자>
+SELECT *
+FROM patients
+WHERE name LIKE '백%';
+
+<특정 날짜 사이 예약>
+SELECT *
+FROM appointments
+WHERE visit_date BETWEEN '2025-10-21' AND '2025-10-23'; 
+
+<특정 단어 메모 조회>
+SELECT *
+FROM appointments
+WHERE chart LIKE '%depress%'; 
+
